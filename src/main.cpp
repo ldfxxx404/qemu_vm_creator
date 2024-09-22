@@ -2,84 +2,90 @@
 #include <iostream>
 #include <string>
 
-void createNewDiskImage() {
-  std::string diskName, diskSize, isoPath;
-
-  std::cout << "Введите имя виртуального диска: ";
+void inputQcowDiskInfo(std::string &diskName, std::string &diskSize) {
+  std::cout << "Input new name: ";
   std::cin >> diskName;
-  std::cout << "Введите размер для нового диска (например, 10G): ";
+  std::cout << "Input new size (ex. 10G): ";
   std::cin >> diskSize;
-  std::cout << "Введите полный путь до ISO-образа: ";
-  std::cin >> isoPath;
+}
 
+void createNewQcowDiskImage(const std::string &diskName,
+                            const std::string &diskSize) {
   std::string command =
       "qemu-img create -f qcow2 " + diskName + ".qcow2 " + diskSize;
   if (system(command.c_str()) == 0) {
-    std::cout << "Диск " << diskName << ".qcow2 размером " << diskSize
-              << " успешно создан.\n";
+    std::cout << "Disk " << diskName << ".qcow2 размером " << diskSize
+              << " successfylly created.\n";
   } else {
-    std::cout << "Ошибка при создании виртуального диска.\n";
+    std::cout << "Error when creating virtual disk.\n";
   }
 }
 
-// run and install .iso function
-// include boot d, -cdrom param
-// qemu-system-x86_64 -boot d -cdrom ~/Downloads/os-install.iso -m 2G -hda
-// ~/qemu/virtual_disk.img
-
-void runAndInstallVirtMachine() {
-  std::string isoPath, diskFile;
-  std::cout << "Введите путь к ISO-образу: ";
+void inputVirtualMachineParameters(std::string &isoPath,
+                                   std::string &diskFile) {
+  std::cout << "Input full path to ISO-iamge: ";
   std::cin >> isoPath;
-  std::cout << "Введите путь к файлу виртуального диска: ";
+  std::cout << "Input full path to qcow2 file: ";
   std::cin >> diskFile;
+}
+
+void runAndInstallVirtualMachine(const std::string &isoPath,
+                                 const std::string &diskFile) {
+
   std::string command = "qemu-system-x86_64 -boot d -cdrom " + isoPath +
                         " -m 4096 -enable-kvm -vga virtio -display gtk -netdev "
                         "user,id=user.0 -device e1000,netdev=user.0 -hda " +
                         diskFile;
   if (system(command.c_str()) == 0) {
-    std::cout << "Виртуальная машина готова к установке";
+    std::cout << "The virtual machine is ready for installation";
   } else {
-    std::cout << "Произошла ошибка при запуске машины";
+    std::cout << "Error when VM start";
   }
 }
 
-void runVirtMachine() {
-  std::string diskFile;
-
-  std::cout << "Введите путь к файлу виртуального диска: ";
-  std::cin >> diskFile;
-
+void runVirtualMachine(const std::string &diskFile) {
   std::string command =
-      "qemu-system-x86_64 -drive file=" + diskFile +
-      ",format=qcow2 -boot c " + // -boot c для загрузки с диска
+      "qemu-system-x86_64 -drive file=" + diskFile + ",format=qcow2 -boot c " +
       " -m 4096 -enable-kvm -vga virtio -display gtk -netdev user,id=user.0 "
       "-device e1000,netdev=user.0";
 
   if (system(command.c_str()) == 0) {
-    std::cout << "Виртуальная машина успешно запущена.\n";
+    std::cout << "The virtual machine successfylly started.\n";
   } else {
-    std::cout << "Произошла ошибка при запуске машины.\n";
+    std::cout << "An error occurred while starting the machine\n";
+  }
+}
+
+void menuFunction() {
+
+  int choice;
+  std::cout << "1. Create new qcow2 image\n";
+  std::cout << "2. Install VM\n";
+  std::cout << "3. Start VM\n";
+  std::cout << "Select option (1, 2 or 3): ";
+  std::cin >> choice;
+
+  if (choice == 1) {
+    std::string diskName, diskSize;
+    inputQcowDiskInfo(diskName, diskSize);
+    createNewQcowDiskImage(diskName, diskSize);
+  } else if (choice == 2) {
+    std::string isoPath, diskFile;
+    inputVirtualMachineParameters(isoPath, diskFile);
+    runAndInstallVirtualMachine(isoPath, diskFile);
+  } else if (choice == 3) {
+    std::string diskFile;
+    std::cout << "Enter the path to the virtual disk file: ";
+    std::cin >> diskFile;
+    runVirtualMachine(diskFile);
+  } else {
+    std::cout << "Incorrect parameter is specified!\n";
   }
 }
 
 int main(void) {
-  int choice;
-  std::cout << "QEMU Script\n";
-  std::cout << "1. Создать виртуальный диск\n";
-  std::cout << "2. Установить виртуальную машину\n";
-  std::cout << "3. Запустить виртуальную машину\n";
-  std::cout << "Выберите действие (1 или 3): ";
-  std::cin >> choice;
-  if (choice == 1) {
-    createNewDiskImage();
-  } else if (choice == 2) {
-    runAndInstallVirtMachine();
-  } else if (choice == 3) {
-    runVirtMachine();
-  } else {
-    std::cout << "Указан некорректный параметр!\n";
-  }
+
+  menuFunction();
 
   return 0;
 }
