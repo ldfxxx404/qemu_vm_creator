@@ -16,5 +16,4 @@ The program provides an intuitive interface for performing basic operations with
 
 # TODO
 1. Refactor code
-2. Add modular architecture
-3. Improve functionality
+2. Improve functionality
