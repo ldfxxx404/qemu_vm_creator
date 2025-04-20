@@ -12,8 +12,3 @@ QEMU Assistant
 
 
 The program provides an intuitive interface for performing basic operations with virtual machines, making the virtualization process more accessible and convenient.
----
-
-# TODO
-1. Refactor code
-2. Improve functionality
