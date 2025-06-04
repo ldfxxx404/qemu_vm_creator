@@ -14,7 +14,7 @@ void createNewQcowDiskImage(const std::string &diskName,
   std::string command =
       "qemu-img create -f qcow2 " + diskName + ".qcow2 " + diskSize;
   if (system(command.c_str()) == 0) {
-    std::cout << "Disk " << diskName << ".qcow2 размером " << diskSize
+    std::cout << "Disk " << diskName << ".qcow2 size " << diskSize
               << " successfylly created.\n";
   } else {
     std::cout << "Error when creating virtual disk.\n";
